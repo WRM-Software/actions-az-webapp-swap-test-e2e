@@ -1,12 +1,15 @@
-name: Swap Slots
+name: "Swap Slot"
 on:
   workflow_dispatch:
   pull_request:
     types: [opened, closed]
     branches:
-      - appsettings
+      - appsettings-e2e
+
 env:
   config_dir: ./.github/workflows/configs
+  repo: WRM-Software/actions-az-webapp-swap-test-e2e
+
 jobs:
   get-matrix:
     runs-on: ubuntu-latest
@@ -29,12 +32,13 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.get-matrix.outputs.result) }}
     steps:
-      - uses: actions/checkout@v2
-      # SP: github action az webapp swap
+      - uses: actions/checkout@v3
+      # SP: 
       - uses: azure/login@v1
         with:
-          creds: ${{ secrets.azure_credentials }}
-      - uses: mildronize/actions-az-webapp-swap@develop
+          creds: ${{ secrets.swap_azure_service_principal_sdk }}
+          allow-no-subscriptions: true
+      - uses: mildronize/actions-az-webapp-swap@v2.0.1
         with:
           mode: get-deploy-slots
           config: ${{ toJson(matrix) }}
@@ -44,14 +48,15 @@ jobs:
     name: Create Swap Plan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Create Swap Plan
-        uses: mildronize/actions-az-webapp-swap@develop
+        uses: mildronize/actions-az-webapp-swap@v2.0.1
         with: 
           mode: create-swap-plan
-          token: ${{ secrets.PAT }}
-          repo: mildronize/actions-az-webapp-swap-demo
-          
+          token: ${{ secrets.MY_WRM_PERSONAL_ACCESS_TOKEN }}
+          repo: ${{ env.repo }}
+          ref: appsettings-e2e
+
   set-slot-settings:
     if: >- 
       github.event_name == 'pull_request' &&
@@ -64,14 +69,15 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.get-matrix.outputs.result) }}
     steps:
-      - uses: actions/checkout@v2
-      # SP: github action az webapp swap
+      - uses: actions/checkout@v3
+      # SP: 
       - uses: azure/login@v1
         with:
-          creds: ${{ secrets.azure_credentials }}
+          creds: ${{ secrets.swap_azure_service_principal_sdk }}
+          allow-no-subscriptions: true
       
       - name: set-slot-settings
-        uses: mildronize/actions-az-webapp-swap@develop
+        uses: mildronize/actions-az-webapp-swap@v2.0.1
         with: 
           mode: set-deploy-slots
           config: ${{ toJson(matrix) }}
@@ -89,14 +95,15 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.get-matrix.outputs.result) }}
     steps:
-      - uses: actions/checkout@v2
-      # SP: github action az webapp swap
+      - uses: actions/checkout@v3
+      # SP: 
       - uses: azure/login@v1
         with:
-          creds: ${{ secrets.azure_credentials }}
+          creds: ${{ secrets.swap_azure_service_principal_sdk }}
+          allow-no-subscriptions: true
       
       - name: set-slot-settings
-        uses: mildronize/actions-az-webapp-swap@develop
+        uses: mildronize/actions-az-webapp-swap@v2.0.1
         with: 
           mode: swap-slots
           config: ${{ toJson(matrix) }}
@@ -106,13 +113,14 @@ jobs:
     needs: [ swap-slot ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: clean
-        uses: mildronize/actions-az-webapp-swap@develop
+        uses: mildronize/actions-az-webapp-swap@v2.0.1
         with: 
           mode: clean
-          token: ${{ secrets.PAT }}
-          repo: mildronize/actions-az-webapp-swap-demo
+          token: ${{ secrets.MY_WRM_PERSONAL_ACCESS_TOKEN }}
+          repo: ${{ env.repo }}
+          ref: appsettings-e2e
 
   close:
     if: >- 
@@ -122,11 +130,11 @@ jobs:
     name: close PR
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: clean
-        uses: mildronize/actions-az-webapp-swap@develop
+        uses: mildronize/actions-az-webapp-swap@v2.0.1
         with: 
           mode: clean
-          token: ${{ secrets.PAT }}
-          repo: mildronize/actions-az-webapp-swap-demo
+          token: ${{ secrets.MY_WRM_PERSONAL_ACCESS_TOKEN }}
+          repo: ${{ env.repo }}
   
