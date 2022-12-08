@@ -21,7 +21,7 @@ jobs:
     - name: Export deployment matrix
       id: get-matrix
       run: |
-        node ${{ env.script_path }}
+        node ${{ env.script_path }} test-get-deploy-slots.json
       working-directory: ${{ env.config_dir }}
 
   get-slot-settings:
