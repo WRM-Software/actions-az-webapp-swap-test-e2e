@@ -1,0 +1,10 @@
+[
+  {
+    "name": "wrmstorm-dev-swap-pipeline-test-e2e-0",
+    "resourceGroup": "rg-storm-dev-mt-swap-pipeline-test-e2e",
+    "slot": "staging",
+    "targetSlot": "production", 
+    "defaultSlotSetting": "true",
+    "defaultSensitive": "true"
+  }
+]

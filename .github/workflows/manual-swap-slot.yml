@@ -1,26 +1,28 @@
-name: "Swap Slot"
+name: "Manual: Swap Slot"
 on:
   workflow_dispatch:
   pull_request:
     types: [opened, closed]
     branches:
-      - appsettings-e2e
-
+      - appsettings-manual
 env:
   config_dir: ./.github/workflows/configs
-  repo: WRM-Software/actions-az-webapp-swap-test-e2e
+  repo: actions-az-webapp-swap-test-e2e
+
+  script_path: ./manual-swap-slot/index.js
 
 jobs:
   get-matrix:
     runs-on: ubuntu-latest
     outputs:
-      result: ${{ steps.get-matrix.outputs.deployment-matrix }}
+      result: ${{ steps.get-matrix.outputs.matrix }}
     steps:
     - uses: actions/checkout@v3
     - name: Export deployment matrix
       id: get-matrix
       run: |
-        node ./index.js test-get-deploy-slots.json
+        npm install --only=
+        npx tsx ${{ env.script_path }}
       working-directory: ${{ env.config_dir }}
 
   get-slot-settings:
@@ -33,10 +35,10 @@ jobs:
         include: ${{ fromJson(needs.get-matrix.outputs.result) }}
     steps:
       - uses: actions/checkout@v3
-      # SP: 
+      # SP:  "DevOps WRM-Software/actions-az-webapp-swap-test-e2e Swap Slot for Test"
       - uses: azure/login@v1
         with:
-          creds: ${{ secrets.swap_azure_service_principal_sdk }}
+          creds: ${{ secrets.Swap_azure_service_principal_sdk }}
           allow-no-subscriptions: true
       - uses: mildronize/actions-az-webapp-swap@v2.0.1
         with:
@@ -55,7 +57,7 @@ jobs:
           mode: create-swap-plan
           token: ${{ secrets.MY_WRM_PERSONAL_ACCESS_TOKEN }}
           repo: ${{ env.repo }}
-          ref: appsettings-e2e
+          ref: appsettings-manual
 
   set-slot-settings:
     if: >- 
@@ -70,10 +72,10 @@ jobs:
         include: ${{ fromJson(needs.get-matrix.outputs.result) }}
     steps:
       - uses: actions/checkout@v3
-      # SP: 
+      # SP:  "DevOps WRM-Software/actions-az-webapp-swap-test-e2e Swap Slot for Test"
       - uses: azure/login@v1
         with:
-          creds: ${{ secrets.swap_azure_service_principal_sdk }}
+          creds: ${{ secrets.Swap_azure_service_principal_sdk }}
           allow-no-subscriptions: true
       
       - name: set-slot-settings
@@ -96,10 +98,10 @@ jobs:
         include: ${{ fromJson(needs.get-matrix.outputs.result) }}
     steps:
       - uses: actions/checkout@v3
-      # SP: 
+      # SP:  "DevOps WRM-Software/actions-az-webapp-swap-test-e2e Swap Slot for Test"
       - uses: azure/login@v1
         with:
-          creds: ${{ secrets.swap_azure_service_principal_sdk }}
+          creds: ${{ secrets.Swap_azure_service_principal_sdk }}
           allow-no-subscriptions: true
       
       - name: set-slot-settings
@@ -120,7 +122,7 @@ jobs:
           mode: clean
           token: ${{ secrets.MY_WRM_PERSONAL_ACCESS_TOKEN }}
           repo: ${{ env.repo }}
-          ref: appsettings-e2e
+          ref: appsettings-manual
 
   close:
     if: >- 
