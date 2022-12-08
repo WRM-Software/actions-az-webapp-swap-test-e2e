@@ -7,7 +7,7 @@ on:
       - appsettings-manual
 env:
   config_dir: ./.github/workflows/configs
-  repo: actions-az-webapp-swap-test-e2e
+  repo: WRM-Software/actions-az-webapp-swap-test-e2e
 
   script_path: ./manual-swap-slot/index.js
 
@@ -21,7 +21,7 @@ jobs:
     - name: Export deployment matrix
       id: get-matrix
       run: |
-        node ${{ env.script_path }} test-get-deploy-slots.json
+        node ${{ env.script_path }} ./manual-swap-slot/test-get-deploy-slots.json
       working-directory: ${{ env.config_dir }}
 
   get-slot-settings:
